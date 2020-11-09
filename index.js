@@ -6,7 +6,7 @@ server.use(express.json()); //teaches express how to read json
 
 let users = [
     {
-        id: 1, // hint: use the shortid npm package to generate it
+        id: shortid.generate(), // hint: use the shortid npm package to generate it
         name: "Jane Doe", // String, required
         bio: "Not Tarzan's Wife, another Jane",  // String, required
     },
@@ -22,14 +22,31 @@ server.get('/api/users', (req, res) => {
 
 // server.get('api/users/:id')
 
-server.delete('api/users/:id', (req, res) => {
+server.delete('/api/users/:id', (req, res) => {
     const id = req.params.id;
-    const deleted = users.find(u => (u.id = id));
+    const deleted = users.find(u => u.id === id);
+    
     users = users.filter(u => u.id !== id);
+    
     res.json(deleted);
 })
 
-// server.put('api/users/:id')
+server.put('/api/users/:id', (req, res) => {
+    const id = req.params.id;
+    const changes = req.body
+    
+    let found = users.find(u => u.id === id);
+
+    if(found) {
+        found = Object.assign(found, changes); //apply changes without overwriting the record 
+    } else {
+        //did not find hub with that id 
+        res.status(404).json({message: "User not found"});
+    }
+
+    res.json(found);
+
+    })
 
 server.post('/api/users', (req, res) => {
     const newUser = req.body; //this needs express.json
@@ -37,6 +54,8 @@ server.post('/api/users', (req, res) => {
     users.push(newUser);
     res.json(newUser);
 })
+
+
 
 
 const PORT = 8000;
