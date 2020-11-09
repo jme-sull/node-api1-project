@@ -49,10 +49,15 @@ server.put('/api/users/:id', (req, res) => {
     })
 
 server.post('/api/users', (req, res) => {
+    if (!req.body.name || !req.body.bio){
+        res.status(400).json({ errorMessage: "Please provide name and bio for the user." });
+    }
+    else {
     const newUser = req.body; //this needs express.json
     newUser.id = shortid.generate();
     users.push(newUser);
     res.json(newUser);
+    }
 })
 
 
